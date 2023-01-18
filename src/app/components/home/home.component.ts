@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
+import { StoreModel } from '../../models/store.model';
 import { CategoriesService } from '../../services/categories.service';
+import { StoresService } from '../../services/stores.service';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +14,9 @@ import { CategoriesService } from '../../services/categories.service';
 })
 export class HomeComponent {
   readonly categories$: Observable<CategoryModel[]> = this._categoriesService.getAll();
+  readonly stores$: Observable<StoreModel[]> = this._storesService.getAll();
+  readonly aboutUs$: Observable<string[]> = of(['Company', 'About', 'Blog', 'Help Center', 'Our Value' ])
 
-  constructor(private _categoriesService: CategoriesService) {
+  constructor(private _categoriesService: CategoriesService, private _storesService: StoresService) {
   }
 }
