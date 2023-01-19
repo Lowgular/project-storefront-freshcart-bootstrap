@@ -44,15 +44,15 @@
                         <h6>We have <span class="text-primary">{{stores.length}}</span> vendors now</h6>
                     </div>
                 </div>
-                <div *ngFor="let item of storeList$ | async" class="col-12 col-sm-6 col-lg-4">
-                    <a class="card flex-row p-8 card-product mb-3" [routerLink]="'/stores/'+ item.id">
+                <div *ngFor="let store of storeList$ | async" class="col-12 col-sm-6 col-lg-4">
+                    <a class="card flex-row p-8 card-product mb-3" [routerLink]="'/stores/'+ store.id">
                         <div>
-                            <img [src]="item.logoUrl" [alt]="item" class="rounded-circle icon-shape icon-xl">
+                            <img [src]="store.logoUrl" [alt]="store" class="rounded-circle icon-shape icon-xl">
                         </div>
                         <div class="ms-6">
-                            <h5 class="mb-1"><a [routerLink]="'/stores/'+ item.id" class="text-inherit">{{item.name}}</a></h5>
+                            <h5 class="mb-1"><a [routerLink]="'/stores/'+ store.id" class="text-inherit">{{store.name}}</a></h5>
                             <div class="small text-muted">
-                                <ng-container *ngFor="let tag of item.tags; last as last">
+                                <ng-container *ngFor="let tag of store.tags; last as last">
                                     <span>{{tag}}</span>
                                     <!-- <span *ngIf="!last" class="mx-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" fill="#C1C7C6"
@@ -64,7 +64,7 @@
                             </div>
                             <div>
                                 <!-- badge -->
-                                <div class="badge text-bg-light border">{{item.distanceInKm}} km</div>
+                                <div class="badge text-bg-light border">{{store.distanceInKm}} km</div>
                             </div>
                         </div>
                     </a>
