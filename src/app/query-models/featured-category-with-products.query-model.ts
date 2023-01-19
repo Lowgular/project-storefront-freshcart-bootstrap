@@ -6,6 +6,6 @@ export interface FeaturedCategoryWithProductsQueryModel {
     name: string;
     price: number;
     imageUrl: string;
-    featureValue: string;
+    featureValue: number;
   }[];
 }
