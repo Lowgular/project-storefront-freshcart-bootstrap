@@ -1,51 +1,126 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
-import { BehaviorSubject, Observable, of, combineLatest, map } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewEncapsulation,
+} from '@angular/core';
+import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
+import { StoreOnHomePageQueryModel } from '../../query-models/store-on-home-page.query-model';
 import { StoreModel } from '../../models/store.model';
+import { TagModel } from '../../models/tag.model';
+import { CategoryWithProductsQueryModel } from '../../query-models/category-with-products.query-model';
+import { ProductModel } from '../../models/product.model';
 import { CategoriesService } from '../../services/categories.service';
 import { StoresService } from '../../services/stores.service';
-import { TagModel } from 'src/app/models/tag.model';
-import { StoreOnHomePageQueryModel } from 'src/app/query-models/store-on-home-page.query-model';
+import { ProductsService } from '../../services/products.service';
 
 @Component({
   selector: 'app-home',
   styleUrls: ['./home.component.scss'],
   templateUrl: './home.component.html',
   encapsulation: ViewEncapsulation.Emulated,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  readonly categories$: Observable<CategoryModel[]> = this._categoriesService.getAll();
+  readonly categories$: Observable<CategoryModel[]> =
+    this._categoriesService.getAll();
   readonly stores$: Observable<StoreOnHomePageQueryModel[]> = combineLatest([
     this._storesService.getAll(),
-    this._storesService.getAllTags()
+    this._storesService.getAllTags(),
   ]).pipe(
-    map(([stores, tags] : [StoreModel[], TagModel[]]) => this._mapToStoreQueryModel(stores, tags))
+    map(([stores, tags]: [StoreModel[], TagModel[]]) =>
+      this._mapToStoreQueryModel(stores, tags)
+    )
   );
 
+  readonly aboutUs$: Observable<string[]> = of([
+    'Company',
+    'About',
+    'Blog',
+    'Help Center',
+    'Our Value',
+  ]);
 
-  readonly aboutUs$: Observable<string[]> = of(['Company', 'About', 'Blog', 'Help Center', 'Our Value']);
+  private _mobileMenuStatusSubject: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  public mobileMenuStatus$: Observable<boolean> =
+    this._mobileMenuStatusSubject.asObservable();
 
-  private _mobileMenuStatusSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public mobileMenuStatus$: Observable<boolean> = this._mobileMenuStatusSubject.asObservable();
+  readonly fruitsAndVegetables$: Observable<CategoryWithProductsQueryModel> =
+    combineLatest([
+      this._categoriesService.getOne('5'),
+      this._productsService.getAll(),
+    ]).pipe(
+      map(([category, products]: [CategoryModel, ProductModel[]]) => {
+        return {
+          categoryName: category.name,
+          categoryId: category.id,
+          products: this._mapToCategoryWithProductsQueryModel(
+            category,
+            products
+          ),
+        };
+      })
+    );
+  readonly snackAndMunchies$: Observable<CategoryWithProductsQueryModel> =
+    combineLatest([
+      this._categoriesService.getOne('2'),
+      this._productsService.getAll(),
+    ]).pipe(
+      map(([category, products]: [CategoryModel, ProductModel[]]) => {
+        return {
+          categoryName: category.name,
+          categoryId: category.id,
+          products: this._mapToCategoryWithProductsQueryModel(
+            category,
+            products
+          ),
+        };
+      })
+    );
 
-
-  constructor(private _categoriesService: CategoriesService, private _storesService: StoresService) {
-  }
+  constructor(
+    private _categoriesService: CategoriesService,
+    private _storesService: StoresService,
+    private _productsService: ProductsService
+  ) {}
 
   showMenu(value: boolean): void {
     this._mobileMenuStatusSubject.next(value);
   }
 
-  private _mapToStoreQueryModel(stores: StoreModel[], tags: TagModel[]): StoreOnHomePageQueryModel[] {
-    const tagMap = tags.reduce((a, c) => ({...a, [c.id]: c}), {}) as Record<string, TagModel>;
+  private _mapToStoreQueryModel(
+    stores: StoreModel[],
+    tags: TagModel[]
+  ): StoreOnHomePageQueryModel[] {
+    const tagMap = tags.reduce((a, c) => ({ ...a, [c.id]: c }), {}) as Record<
+      string,
+      TagModel
+    >;
 
     return stores.map((store) => ({
       id: store.id,
       name: store.name,
       logoUrl: store.logoUrl,
       tags: (store.tagIds ?? []).map((id) => tagMap[id]?.name),
-      distance: (store.distanceInMeters/1000)
-    }))
+      distance: store.distanceInMeters / 1000,
+    }));
+  }
+
+  private _mapToCategoryWithProductsQueryModel(
+    category: CategoryModel,
+    products: ProductModel[]
+  ): { name: string; price: number; imageUrl: string }[] {
+    const displayedProducts = products
+      .filter((product) => product.categoryId === category.id)
+      .sort((a, b) => (a.featureValue > b.featureValue ? -1 : 1))
+      .slice(0, 5);
+
+    return displayedProducts.map((product) => ({
+      name: product.name,
+      price: Math.round(product.price),
+      imageUrl: product.imageUrl,
+    }));
   }
 }
