@@ -7,9 +7,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { MetersToKilometersPipe } from './meters-to-kilometers.pipe';
+
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, MetersToKilometersPipe],
   imports: [
     BrowserModule,
     AppRoutingModule,
