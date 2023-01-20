@@ -42,10 +42,6 @@ export class HomeComponent {
     'Our Value',
   ]);
 
-  private _mobileMenuStatusSubject: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(false);
-  public mobileMenuStatus$: Observable<boolean> =
-    this._mobileMenuStatusSubject.asObservable();
 
   readonly fruitsAndVegetables$: Observable<CategoryWithProductsQueryModel> =
     combineLatest([
@@ -86,9 +82,6 @@ export class HomeComponent {
     private _productsService: ProductsService
   ) {}
 
-  showMenu(value: boolean): void {
-    this._mobileMenuStatusSubject.next(value);
-  }
 
   private _mapToStoreQueryModel(
     stores: StoreModel[],

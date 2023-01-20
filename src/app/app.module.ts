@@ -8,6 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { MetersToKilometersPipe } from './meters-to-kilometers.pipe';
+import { HeaderComponentModule } from './components/header/header.component-module';
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import { MetersToKilometersPipe } from './meters-to-kilometers.pipe';
     CollapseModule,
     CommonModule,
     RouterModule,
+    HeaderComponentModule
   ],
   providers: [],
   bootstrap: [AppComponent],
