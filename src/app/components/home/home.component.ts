@@ -34,15 +34,6 @@ export class HomeComponent {
     )
   );
 
-  readonly aboutUs$: Observable<string[]> = of([
-    'Company',
-    'About',
-    'Blog',
-    'Help Center',
-    'Our Value',
-  ]);
-
-
   readonly fruitsAndVegetables$: Observable<CategoryWithProductsQueryModel> =
     combineLatest([
       this._categoriesService.getOne('5'),
