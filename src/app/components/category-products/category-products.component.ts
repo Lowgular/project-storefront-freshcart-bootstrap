@@ -1,4 +1,3 @@
-import { identifierName } from '@angular/compiler';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,8 +5,8 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject, combineLatest, of } from 'rxjs';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, of } from 'rxjs';
+import {  map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
 import { ProductModel } from '../../models/product.model';
 import { CategoriesService } from '../../services/categories.service';
@@ -33,19 +32,11 @@ export class CategoryProductsComponent {
 
   readonly categoryData$: Observable<CategoryModel> =
     this._activatedRoute.params.pipe(
-      switchMap((data) => this._categoriesService.getOne(data['categoryId']))
+      switchMap((data) => this._categoriesService.getOne(data['categoryId'])),
+      shareReplay(1)
     );
   readonly categories$: Observable<CategoryModel[]> =
     this._categoriesService.getAll();
-
-  // readonly productsInCategory$: Observable<ProductModel[]> = combineLatest([
-  //   this._productsService.getAll(),
-  //   this.categoryData$,
-  // ]).pipe(
-  //   map(([products, category]: [ProductModel[], CategoryModel]) => {
-  //     return products.filter((product) => product.categoryId === category.id);
-  //   })
-  // );
 
   readonly productsInCategory$: Observable<ProductModel[]> = combineLatest([
     this._productsService.getAll(),
