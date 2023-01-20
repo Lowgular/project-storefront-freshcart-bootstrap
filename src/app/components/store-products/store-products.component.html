@@ -44,3 +44,19 @@
         </div>
     </div>
 </section>
+
+<section class="my-lg-14 my-8">
+    <div class="container" *ngIf="storeData$ | async as storeData">
+        <div class="row">
+            <h5>{{storeData.name}} products:</h5>
+            <div *ngFor="let item of storeProducts$ | async" class="col-12 col-lg-2 col-md-3">
+                <div class="grid">
+                    <div class="card-body text-center py-8"><!-- img --><img [src]="item.imageUrl" [alt]="item.name"
+                            class="mb-3"><!-- text -->
+                        <div class="text-truncate">{{item.name}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
