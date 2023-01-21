@@ -34,19 +34,6 @@ export class HomeComponent {
     )
   );
 
-  readonly aboutUs$: Observable<string[]> = of([
-    'Company',
-    'About',
-    'Blog',
-    'Help Center',
-    'Our Value',
-  ]);
-
-  private _mobileMenuStatusSubject: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(false);
-  public mobileMenuStatus$: Observable<boolean> =
-    this._mobileMenuStatusSubject.asObservable();
-
   readonly fruitsAndVegetables$: Observable<CategoryWithProductsQueryModel> =
     combineLatest([
       this._categoriesService.getOne('5'),
@@ -86,9 +73,6 @@ export class HomeComponent {
     private _productsService: ProductsService
   ) {}
 
-  showMenu(value: boolean): void {
-    this._mobileMenuStatusSubject.next(value);
-  }
 
   private _mapToStoreQueryModel(
     stores: StoreModel[],
