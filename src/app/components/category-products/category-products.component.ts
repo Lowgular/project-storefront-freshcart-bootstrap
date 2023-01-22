@@ -3,16 +3,24 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, combineLatest, of } from 'rxjs';
-import { filter, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
+import {
+  filter,
+  map,
+  shareReplay,
+  startWith,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs/operators';
 import { SortingOptionsQueryModel } from '../../query-models/sorting-options.query-model';
 import { CategoryModel } from '../../models/category.model';
 import { ProductModel } from '../../models/product.model';
+import { PaginationQueryModel } from '../../query-models/pagination.query-model';
 import { CategoriesService } from '../../services/categories.service';
 import { ProductsService } from '../../services/products.service';
-import { Router } from '@angular/router';
+import { format } from 'path';
 
 @Component({
   selector: 'app-category-products',
@@ -46,6 +54,15 @@ export class CategoryProductsComponent {
       }))
     );
 
+  readonly currentPaginationValues$: Observable<PaginationQueryModel> =
+    this._activatedRoute.queryParams.pipe(
+      map((data) => {
+        return data['pageSize'] || data['pageNumber']
+          ? { limit: +data['pageSize'], page: +data['pageNumber'] }
+          : { limit: 5, page: 1 };
+      })
+    );
+
   readonly productsInCategory$: Observable<ProductModel[]> = combineLatest([
     this._productsService.getAll(),
     this.categoryData$,
@@ -67,6 +84,33 @@ export class CategoryProductsComponent {
             return sortingOption.order === 'asc' ? -1 : 1;
           return 0;
         });
+    }),
+    shareReplay(1)
+  );
+
+  readonly displayedProducts$: Observable<ProductModel[]> = combineLatest([
+    this.productsInCategory$,
+    this.currentPaginationValues$,
+  ]).pipe(
+    map(([products, currentValues]) =>
+      products.slice(
+        currentValues.limit * (currentValues.page - 1),
+        currentValues.limit * currentValues.page
+      )
+    )
+  );
+
+  readonly limitOptions$: Observable<number[]> = of([5, 10, 15]);
+  readonly currentPageOptions$: Observable<number[]> = combineLatest([
+    this.productsInCategory$,
+    this.currentPaginationValues$,
+  ]).pipe(
+    map(([products, currentValues]) => {
+      let arr: number[] = [];
+      for (let i = 0; i < products.length / currentValues.limit; i++) {
+        arr.push(i + 1);
+      }
+      return arr;
     })
   );
 
@@ -85,4 +129,36 @@ export class CategoryProductsComponent {
     private _productsService: ProductsService,
     private _router: Router
   ) {}
+
+  onLimitChanged(limit: number): void { 
+    this.productsInCategory$
+      .pipe(
+        take(1),
+        tap((products) =>
+          this._router.navigate([], {
+            queryParams: {
+              pageSize: limit,
+              pageNumber: Math.round(products.length/limit),
+            },
+          })
+        )
+      )
+      .subscribe();
+  }
+
+  onPageChanged(page: number): void {
+    this.currentPaginationValues$
+      .pipe(
+        take(1),
+        tap((currentValues) =>
+          this._router.navigate([], {
+            queryParams: {
+              pageSize: currentValues.limit,
+              pageNumber: page,
+            },
+          })
+        )
+      )
+      .subscribe();
+  }
 }
