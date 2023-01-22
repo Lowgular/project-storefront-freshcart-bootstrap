@@ -130,7 +130,7 @@ export class CategoryProductsComponent {
     private _router: Router
   ) {}
 
-  onLimitChanged(limit: number): void { 
+  onLimitChanged(limit: number): void {
     this.productsInCategory$
       .pipe(
         take(1),
@@ -138,7 +138,7 @@ export class CategoryProductsComponent {
           this._router.navigate([], {
             queryParams: {
               pageSize: limit,
-              pageNumber: Math.round(products.length/limit),
+              pageNumber: Math.ceil(products.length / limit),
             },
           })
         )
