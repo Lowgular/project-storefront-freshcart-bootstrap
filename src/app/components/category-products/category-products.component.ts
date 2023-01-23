@@ -22,6 +22,7 @@ import { PaginationQueryModel } from '../../query-models/pagination.query-model'
 import { CategoriesService } from '../../services/categories.service';
 import { ProductsService } from '../../services/products.service';
 import { FormControl } from '@angular/forms';
+import { ProductsFiltersQueryModel } from 'src/app/query-models/products-filters.query-model';
 
 @Component({
   selector: 'app-category-products',
@@ -49,6 +50,8 @@ export class CategoryProductsComponent {
     { name: 'Avg. Rating', property: 'ratingValue', direction: 'desc' },
   ]);
 
+  readonly ratingFilterOptions$: Observable<number[]> = of([5, 4, 3, 2]);
+
   readonly sortingOption$: Observable<{ sortBy: string; order: string }> =
     this._activatedRoute.queryParams.pipe(
       map((params) => ({
@@ -57,17 +60,17 @@ export class CategoryProductsComponent {
       }))
     );
 
-  readonly currentFilterOptions$: Observable<{
-    priceFrom: number;
-    priceTo: number;
-  }> = this._activatedRoute.queryParams.pipe(
-    map((params) => {
-      return {
-        priceFrom: params['priceFrom'] ?? 0,
-        priceTo: params['priceTo'] ?? 1000,
-      };
-    })
-  );
+  readonly currentFilterOptions$: Observable<ProductsFiltersQueryModel> =
+    this._activatedRoute.queryParams.pipe(
+      map((params) => {
+        return {
+          priceFrom: params['priceFrom'] ?? 0,
+          priceTo: params['priceTo'] ?? 1000,
+          rating: params['rating'] ?? 0,
+          store: '',
+        };
+      })
+    );
 
   readonly productsInCategory$: Observable<ProductModel[]> = combineLatest([
     this._productsService.getAll(),
@@ -76,12 +79,14 @@ export class CategoryProductsComponent {
     this.sortingOption$,
   ]).pipe(
     map(([products, category, currentFilterOptions, sortingOption]) => {
+      
+      if(currentFilterOptions.rating===0){
       return products
         .filter((product) => product.categoryId === category.id)
         .filter(
           (product) =>
-            product.price >= currentFilterOptions.priceFrom &&
-            product.price <= currentFilterOptions.priceTo
+            product.price >= +currentFilterOptions.priceFrom &&
+            product.price <= +currentFilterOptions.priceTo
         )
         .sort((a, b) => {
           if (
@@ -95,8 +100,28 @@ export class CategoryProductsComponent {
           )
             return sortingOption.order === 'asc' ? -1 : 1;
           return 0;
-        });
-    }),
+        })
+    }else {return products
+      .filter((product) => product.categoryId === category.id)
+      .filter(
+        (product) =>
+          product.price >= +currentFilterOptions.priceFrom &&
+          product.price <= +currentFilterOptions.priceTo &&
+          Math.floor(product.ratingValue) === +currentFilterOptions.rating
+      )
+      .sort((a, b) => {
+        if (
+          a[sortingOption.sortBy as keyof ProductModel] >
+          b[sortingOption.sortBy as keyof ProductModel]
+        )
+          return sortingOption.order === 'asc' ? 1 : -1;
+        if (
+          a[sortingOption.sortBy as keyof ProductModel] <
+          b[sortingOption.sortBy as keyof ProductModel]
+        )
+          return sortingOption.order === 'asc' ? -1 : 1;
+        return 0;
+      })}}),
     shareReplay(1)
   );
 
@@ -135,8 +160,15 @@ export class CategoryProductsComponent {
     })
   );
 
-  readonly priceFrom: FormControl = new FormControl();
-  readonly priceTo: FormControl = new FormControl();
+  readonly priceFrom: FormControl = new FormControl(
+    this._activatedRoute.snapshot.queryParams['priceFrom']
+  );
+  readonly priceTo: FormControl = new FormControl(
+    this._activatedRoute.snapshot.queryParams['priceTo']
+  );
+  readonly rating: FormControl = new FormControl(
+    this._activatedRoute.snapshot.queryParams['rating']
+  );
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -217,5 +249,12 @@ export class CategoryProductsComponent {
         )
       )
       .subscribe();
+  }
+
+  onRatingFilterChanged(value: number) {
+    this._router.navigate([], {
+      queryParams: { rating: value },
+      queryParamsHandling: 'merge',
+    });
   }
 }
