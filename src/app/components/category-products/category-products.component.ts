@@ -3,9 +3,11 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, combineLatest, of } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
 import {
+  debounceTime,
   filter,
   map,
   shareReplay,
@@ -13,16 +15,18 @@ import {
   switchMap,
   take,
   tap,
-  debounceTime,
 } from 'rxjs/operators';
-import { SortingOptionsQueryModel } from '../../query-models/sorting-options.query-model';
 import { CategoryModel } from '../../models/category.model';
+import { StoreModel } from '../../models/store.model';
+import { SortingOptionsQueryModel } from '../../query-models/sorting-options.query-model';
+import { ProductsFiltersQueryModel } from '../../query-models/products-filters.query-model';
 import { ProductModel } from '../../models/product.model';
 import { PaginationQueryModel } from '../../query-models/pagination.query-model';
 import { CategoriesService } from '../../services/categories.service';
 import { ProductsService } from '../../services/products.service';
-import { FormControl } from '@angular/forms';
-import { ProductsFiltersQueryModel } from 'src/app/query-models/products-filters.query-model';
+import { StoresService } from '../../services/stores.service';
+import { timeStamp } from 'console';
+import { StoreProductsComponent } from '../store-products/store-products.component';
 
 @Component({
   selector: 'app-category-products',
@@ -41,6 +45,22 @@ export class CategoryProductsComponent {
     .getAll()
     .pipe(shareReplay(1));
 
+  readonly searchStore: FormControl = new FormControl();
+  readonly stores$: Observable<StoreModel[]> = this._storesService
+    .getAll()
+    .pipe(shareReplay(1));
+
+  readonly displayedStores$: Observable<StoreModel[]> = combineLatest([
+    this.stores$,
+    this.searchStore.valueChanges.pipe(startWith('')),
+  ]).pipe(
+    map(([stores, search]) =>
+      stores.filter((store) =>
+        store.name.toLowerCase().includes(search.toLowerCase())
+      )
+    )
+  );
+
   // sort
 
   readonly sortingOptions$: Observable<SortingOptionsQueryModel[]> = of([
@@ -51,6 +71,7 @@ export class CategoryProductsComponent {
   ]);
 
   readonly ratingFilterOptions$: Observable<number[]> = of([5, 4, 3, 2]);
+  readonly hardcodeStoreIds$: Observable<string[]> = of(['1', '2', '3', '4']);
 
   readonly sortingOption$: Observable<{ sortBy: string; order: string }> =
     this._activatedRoute.queryParams.pipe(
@@ -67,9 +88,12 @@ export class CategoryProductsComponent {
           priceFrom: params['priceFrom'] ?? 0,
           priceTo: params['priceTo'] ?? 1000,
           rating: params['rating'] ?? 0,
-          store: '',
+          stores: new Set<string>(
+            params['stores'] === undefined ? [] : params['stores'].split(',')
+          ),
         };
-      })
+      }),
+      shareReplay(1)
     );
 
   readonly productsInCategory$: Observable<ProductModel[]> = combineLatest([
@@ -79,49 +103,54 @@ export class CategoryProductsComponent {
     this.sortingOption$,
   ]).pipe(
     map(([products, category, currentFilterOptions, sortingOption]) => {
-      
-      if(currentFilterOptions.rating===0){
-      return products
-        .filter((product) => product.categoryId === category.id)
-        .filter(
-          (product) =>
-            product.price >= +currentFilterOptions.priceFrom &&
-            product.price <= +currentFilterOptions.priceTo
-        )
-        .sort((a, b) => {
-          if (
-            a[sortingOption.sortBy as keyof ProductModel] >
-            b[sortingOption.sortBy as keyof ProductModel]
+      if (currentFilterOptions.rating === 0) {
+        return products
+          .filter((product) => product.categoryId === category.id)
+          .filter(
+            (product) =>
+              product.price >= +currentFilterOptions.priceFrom &&
+              product.price <= +currentFilterOptions.priceTo &&
+              product.storeIds.find((storeId: string) =>
+                currentFilterOptions.stores.has(storeId)
+              )
           )
-            return sortingOption.order === 'asc' ? 1 : -1;
-          if (
-            a[sortingOption.sortBy as keyof ProductModel] <
-            b[sortingOption.sortBy as keyof ProductModel]
+          .sort((a, b) => {
+            if (
+              a[sortingOption.sortBy as keyof ProductModel] >
+              b[sortingOption.sortBy as keyof ProductModel]
+            )
+              return sortingOption.order === 'asc' ? 1 : -1;
+            if (
+              a[sortingOption.sortBy as keyof ProductModel] <
+              b[sortingOption.sortBy as keyof ProductModel]
+            )
+              return sortingOption.order === 'asc' ? -1 : 1;
+            return 0;
+          });
+      } else {
+        return products
+          .filter((product) => product.categoryId === category.id)
+          .filter(
+            (product) =>
+              product.price >= +currentFilterOptions.priceFrom &&
+              product.price <= +currentFilterOptions.priceTo &&
+              Math.floor(product.ratingValue) === +currentFilterOptions.rating
           )
-            return sortingOption.order === 'asc' ? -1 : 1;
-          return 0;
-        })
-    }else {return products
-      .filter((product) => product.categoryId === category.id)
-      .filter(
-        (product) =>
-          product.price >= +currentFilterOptions.priceFrom &&
-          product.price <= +currentFilterOptions.priceTo &&
-          Math.floor(product.ratingValue) === +currentFilterOptions.rating
-      )
-      .sort((a, b) => {
-        if (
-          a[sortingOption.sortBy as keyof ProductModel] >
-          b[sortingOption.sortBy as keyof ProductModel]
-        )
-          return sortingOption.order === 'asc' ? 1 : -1;
-        if (
-          a[sortingOption.sortBy as keyof ProductModel] <
-          b[sortingOption.sortBy as keyof ProductModel]
-        )
-          return sortingOption.order === 'asc' ? -1 : 1;
-        return 0;
-      })}}),
+          .sort((a, b) => {
+            if (
+              a[sortingOption.sortBy as keyof ProductModel] >
+              b[sortingOption.sortBy as keyof ProductModel]
+            )
+              return sortingOption.order === 'asc' ? 1 : -1;
+            if (
+              a[sortingOption.sortBy as keyof ProductModel] <
+              b[sortingOption.sortBy as keyof ProductModel]
+            )
+              return sortingOption.order === 'asc' ? -1 : 1;
+            return 0;
+          });
+      }
+    }),
     shareReplay(1)
   );
 
@@ -166,15 +195,18 @@ export class CategoryProductsComponent {
   readonly priceTo: FormControl = new FormControl(
     this._activatedRoute.snapshot.queryParams['priceTo']
   );
-  readonly rating: FormControl = new FormControl(
-    this._activatedRoute.snapshot.queryParams['rating']
-  );
+
+  private _selectedStoresSubject: BehaviorSubject<string[]> =
+    new BehaviorSubject<string[]>([]);
+  public selectedStores$: Observable<string[]> =
+    this._selectedStoresSubject.asObservable();
 
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _categoriesService: CategoriesService,
     private _productsService: ProductsService,
-    private _router: Router
+    private _router: Router,
+    private _storesService: StoresService
   ) {}
 
   ngOnInit(): void {
@@ -256,5 +288,31 @@ export class CategoryProductsComponent {
       queryParams: { rating: value },
       queryParamsHandling: 'merge',
     });
+  }
+
+  onStoresChanged(value: string) {
+    this.currentFilterOptions$
+      .pipe(
+        take(1),
+        tap((data) => {
+          const storesParamSet = data.stores;
+
+          storesParamSet.has(value)
+            ? storesParamSet.delete(value)
+            : storesParamSet.add(value);
+          console.log(storesParamSet);
+          if (storesParamSet.size > 0) {
+            this._router.navigate([], {
+              queryParams: {
+                stores: [...storesParamSet].sort().join(','),
+              },
+              queryParamsHandling: 'merge',
+            });
+          } else {
+            this._router.navigate([]);
+          }
+        })
+      )
+      .subscribe();
   }
 }

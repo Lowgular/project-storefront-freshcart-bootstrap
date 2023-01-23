@@ -2,5 +2,5 @@ export interface ProductsFiltersQueryModel {
   readonly priceFrom: number;
   readonly priceTo: number;
   readonly rating: number;
-  readonly store: string;
+  readonly stores: Set<string>;
 }
