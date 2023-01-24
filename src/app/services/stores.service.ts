@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StoreModel } from '../models/store.model';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class StoresService {
   constructor(private _httpClient: HttpClient) {
   }
