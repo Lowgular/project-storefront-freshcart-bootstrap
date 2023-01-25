@@ -18,8 +18,5 @@ import { StoresService } from 'src/app/services/stores.service';
 export class NavbarComponent {
   readonly categories$: Observable<CategoryModel[]> =
     this._categoriesService.getAllCategories();
-  constructor(
-    private _categoriesService: CategoriesService,
-    private _storesService: StoresService
-  ) {}
+  constructor(private _categoriesService: CategoriesService) {}
 }
