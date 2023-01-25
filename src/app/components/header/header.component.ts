@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { CategoriesService } from '../../services/categories.service';
 
@@ -12,7 +12,17 @@ import { CategoriesService } from '../../services/categories.service';
 })
 export class HeaderComponent {
   readonly categoryList$: Observable<CategoryModel[]> = this._categoriesService.getAllCategories();
+  private _hamburgerMenuSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public hamburgerMenu$: Observable<boolean> = this._hamburgerMenuSubject.asObservable();
 
   constructor(private _categoriesService: CategoriesService) {
+  }
+
+  showMenu(): void {
+    this._hamburgerMenuSubject.next(true);
+  }
+
+  hideMenu(): void {
+    this._hamburgerMenuSubject.next(false);
   }
 }
