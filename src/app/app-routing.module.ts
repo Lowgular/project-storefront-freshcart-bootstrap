@@ -10,7 +10,7 @@ import { StoreProductsComponentModule } from './components/store-products/store-
 const routes: Routes = [
   { path: 'categories/:categoryId', component: CategoryProducuctsComponent },
   { path: '', component: HomeComponent },
-  { path: 'stories/:storeId', component: StoreProductsComponent },
+  { path: 'stores/:storeId', component: StoreProductsComponent },
 ];
 
 @NgModule({
