@@ -16,21 +16,4 @@ import { StoresService } from '../../services/stores.service';
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent {
-  readonly categories$: Observable<CategoryModel[]> =
-    this._categoriesService.getAllCategories();
-  readonly stores$: Observable<StoreModel[]> =
-    this._storesService.getAllStores();
-  readonly getToKnowUs$: Observable<string[]> = of([
-    'Company',
-    'About',
-    'Blog',
-    'Help Center',
-    'Our Value',
-  ]);
-
-  constructor(
-    private _categoriesService: CategoriesService,
-    private _storesService: StoresService
-  ) {}
-}
+export class HomeComponent {}

@@ -3,10 +3,9 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CategoryModel } from 'src/app/models/category.model';
-import { CategoriesService } from 'src/app/services/categories.service';
-import { StoresService } from 'src/app/services/stores.service';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { CategoryModel } from '../../models/category.model';
+import { CategoriesService } from '../../services/categories.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,5 +17,16 @@ import { StoresService } from 'src/app/services/stores.service';
 export class NavbarComponent {
   readonly categories$: Observable<CategoryModel[]> =
     this._categoriesService.getAllCategories();
+  private _hamburgerNavigationSubject: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  public hamburgerNavigation$: Observable<boolean> =
+    this._hamburgerNavigationSubject.asObservable();
+
   constructor(private _categoriesService: CategoriesService) {}
+  showNavigation(): void {
+    this._hamburgerNavigationSubject.next(true);
+  }
+  hideNavigation(): void {
+    this._hamburgerNavigationSubject.next(false);
+  }
 }
