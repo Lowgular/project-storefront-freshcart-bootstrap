@@ -103,9 +103,15 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }
   },
-  "defaultProject": "ng-freshcard-bootstrap-theme"
+  "defaultProject": "ng-freshcard-bootstrap-theme",
+  "cli": {
+    "analytics": false
+  }
 }
