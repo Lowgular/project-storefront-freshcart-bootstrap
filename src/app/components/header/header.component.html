@@ -17,8 +17,9 @@
             <div class="d-flex align-items-center lh-1">
               <!-- Button -->
               <button class="navbar-toggler collapsed" type="button" aria-controls="navbar-default"
-                      aria-label="Toggle navigation"><span class="icon-bar top-bar mt-0"></span> <span
-                class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span></button>
+                      aria-label="Toggle navigation" (click)="showMenu()"><span class="icon-bar top-bar mt-0"></span>
+                <span
+                  class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span></button>
             </div>
           </div>
         </div>
@@ -28,14 +29,14 @@
 </header>
 <nav class="navbar navbar-expand-lg navbar-light navbar-default pt-0 pb-0">
   <div class="container px-0 px-md-3">
-    <div class="offcanvas offcanvas-start p-4 p-lg-0">
-      <div class="d-flex justify-content-between align-items-center mb-2 d-block d-lg-none"><a routerLink="/"><img
+    <div class="offcanvas offcanvas-start p-4 p-lg-0" [ngClass]="{ show: hamburgerMenu$ | async }">
+      <div class="d-flex justify-content-between align-items-center mb-2 d-block d-lg-none"    ><a routerLink="/"><img
         src="/assets/images/logo/freshcart-logo.svg" alt="eCommerce HTML Template"></a>
-        <button type="button" class="btn-close" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="hideMenu()"></button>
       </div>
       <div class="d-block"></div>
       <ul class="navbar-nav ">
-        <li *ngFor="let item of categoryList$ | async" class="nav-item">
+        <li *ngFor="let item of categoryList$ | async" class="nav-item" (click)="hideMenu()">
           <a class="nav-link" [routerLink]="'categories/' + item.id" role="button">
             {{ item.name }}
           </a>
@@ -45,5 +46,5 @@
   </div>
 </nav>
 <div class="border-bottom pb-lg-4 pb-3">
-
 </div>
+
