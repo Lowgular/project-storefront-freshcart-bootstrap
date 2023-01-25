@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home.component';
 
 @NgModule({
-  imports: [],
+  imports: [RouterModule],
   declarations: [HomeComponent],
   providers: [],
   exports: [HomeComponent]
