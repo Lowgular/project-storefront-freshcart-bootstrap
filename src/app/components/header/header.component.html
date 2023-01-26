@@ -1,4 +1,4 @@
-<header>
+<header *ngIf="categories$ | async as categoryList">
     <div class="bg-light py-1">
         <div class="container">
             <div class="row">
@@ -25,7 +25,7 @@
                     </div>
                     <div class="navbar-collapse collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li *ngFor="let category of categories$ | async as categoryList" class="nav-item">
+                            <li *ngFor="let category of categoryList" class="nav-item">
                                 <a class="nav-link active" aria-current="page"
                                     routerLink="categories/{{category.id}}">{{category.name}}</a>
                             </li>
@@ -46,8 +46,7 @@
                     </div>
                     <div class="d-block">
                         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 mb-md-0">
-                            <li *ngFor="let category of categories$ | async as categoryList"><a
-                                    routerLink="categories/{{category.id}}"
+                            <li *ngFor="let category of categoryList"><a routerLink="categories/{{category.id}}"
                                     class="nav-link px-2 link-dark">{{category.name}}</a>
                             </li>
                         </ul>

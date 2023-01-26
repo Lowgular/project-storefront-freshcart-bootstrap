@@ -18,11 +18,7 @@ import { StoreModel } from 'src/app/models/store.model';
 })
 export class HeaderComponent {
   readonly categories$: Observable<ProductCategoryModel[]> =
-    this._productCategoriesService.getAllCategories().pipe(shareReplay(1));
-
-  readonly stores$: Observable<StoreModel[]> = this._storesService
-    .getAllStores()
-    .pipe(shareReplay(1));
+    this._productCategoriesService.getAllCategories();
 
   constructor(
     private _productCategoriesService: CategoriesService,
