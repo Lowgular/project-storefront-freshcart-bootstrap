@@ -1,4 +1,4 @@
-<section class="my-lg-14 my-8">
+<section id="shopByCategoryGrid" class="my-lg-14 my-8">
     <div class="container">
         <div class="col-12">
             <div class="mb-4">
@@ -8,7 +8,7 @@
         <div class="row">
             <div *ngFor="let category of categories$ | async" class="col-3">
                 <a routerLink="categories/{{category.id}}" class="text-decoration-none text-inherit">
-                    <div class="card card-product">
+                    <div class="card card-product mb-5">
                         <div class="card-body text-center py-8">
                             <img [src]="category.imageUrl" alt="category card" class="mb-3">
                             <div class="text-truncate">{{category.name}}</div>
@@ -17,5 +17,32 @@
                 </a>
             </div>
         </div>
+    </div>
+</section>
+
+<section id="storesGrid" class="my-lg-14 my-8">
+    <div *ngIf="stores$ | async as storeList" class="container">
+        <div class="col-12">
+            <div class="mb-4">
+                <h4>Stores</h4>
+                <h6>We have <span class="text-primary">{{storeList.length}}</span> vendors now</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div *ngFor="let store of storeList" class="col-4">
+                <div class="card flex-row p-8 card-product mb-5">
+                    <div><img [src]="store.logoUrl" [alt]="store" class="rounded-circle icon-shape icon-xl"></div>
+                    <div class="ms-6">
+                        <h5 class="mb-1"><a routerLink="stores/{{store.id}}" class="text-inherit">{{store.name}}</a>
+                        </h5>
+                        <div>
+                            <!-- badge -->
+                            <div class="badge text-bg-light border">{{store.distanceInMeters}} km</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
