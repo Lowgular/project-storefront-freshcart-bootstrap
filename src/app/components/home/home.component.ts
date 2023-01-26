@@ -18,11 +18,10 @@ import { StoresService } from 'src/app/services/stores.service';
 })
 export class HomeComponent {
   readonly categories$: Observable<ProductCategoryModel[]> =
-    this._productCategoriesService.getAllCategories().pipe(shareReplay(1));
+    this._productCategoriesService.getAllCategories();
 
-  readonly stores$: Observable<StoreModel[]> = this._storesService
-    .getAllStores()
-    .pipe(shareReplay(1));
+  readonly stores$: Observable<StoreModel[]> =
+    this._storesService.getAllStores();
 
   constructor(
     private _productCategoriesService: CategoriesService,

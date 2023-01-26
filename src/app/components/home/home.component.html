@@ -1,0 +1,21 @@
+<section class="my-lg-14 my-8">
+    <div class="container">
+        <div class="col-12">
+            <div class="mb-4">
+                <h3>Shop by Categeory</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div *ngFor="let category of categories$ | async" class="col-3">
+                <a routerLink="categories/{{category.id}}" class="text-decoration-none text-inherit">
+                    <div class="card card-product">
+                        <div class="card-body text-center py-8">
+                            <img [src]="category.imageUrl" alt="category card" class="mb-3">
+                            <div class="text-truncate">{{category.name}}</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
