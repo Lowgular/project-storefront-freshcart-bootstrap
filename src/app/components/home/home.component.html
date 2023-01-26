@@ -22,6 +22,35 @@
   </div>
 </section>
 
+<!-- Categories with products section -->
+
+<section class="my-lg-14">
+  <div class="container" *ngFor="let item of categoriesWithProductsList$ | async">
+    <div class="row">
+      <div class="col-12">
+        <h3 class="mt-5">{{ item.categoryName }}</h3>
+      </div>
+      <div *ngFor="let product of item.products" class="col-lg mb-5 col-md-4 mb-5">
+        <a class="text-decoration-none text-inherit">
+          <!-- card -->
+          <div class="card card-product">
+            <div class="card-body text-center py-8">
+              <!-- img -->
+              <img [src]="product.imageUrl" [alt]="product.name" class="mb-3 img-fluid">
+              <!-- text -->
+              <h2 class="fs-6">{{ product.name }}</h2>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                  <span class="text-dark">{{ product.price | currency : 'USD' : 'symbol' : '1.0-0' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a></div>
+    </div>
+  </div>
+</section>
+
 <!-- Store section -->
 
 <section class="my-lg-14">
