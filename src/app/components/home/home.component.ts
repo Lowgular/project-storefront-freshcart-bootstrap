@@ -3,11 +3,9 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
-import { StoreModel } from '../../models/store.model';
 import { CategoriesService } from '../../services/categories.service';
-import { StoresService } from '../../services/stores.service';
 
 @Component({
   selector: 'app-home',
@@ -16,4 +14,9 @@ import { StoresService } from '../../services/stores.service';
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent {}
+export class HomeComponent {
+  readonly categories$: Observable<CategoryModel[]> =
+    this._categoriesService.getAllCategories();
+
+  constructor(private _categoriesService: CategoriesService) {}
+}

@@ -1,3 +1,18 @@
 <section class="my-lg-14 my-8">
-  <div class="container"><div class="row"></div></div>
+  <div class="container">
+    <h3 class="pb-6">Shop by Category</h3>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      <div *ngFor="let item of categories$ | async" class="col">
+        <a class="text-decoration-none text-inherit"
+          ><!-- card -->
+          <div class="card card-product">
+            <div class="card-body text-center py-8">
+              <!-- img --><img [src]="item.imageUrl" [alt]="" /><!-- text -->
+              <div class="text-truncate pt-3">{{ item.name }}</div>
+            </div>
+          </div></a
+        >
+      </div>
+    </div>
+  </div>
 </section>
