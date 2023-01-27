@@ -3,9 +3,13 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
+import { StoreTagModel } from 'src/app/models/store-tag.model';
+import { StoreWithTagsQueryModel } from 'src/app/query-models/store-with-tags.query-model';
 import { CategoryModel } from '../../models/category.model';
+import { StoreModel } from '../../models/store.model';
 import { CategoriesService } from '../../services/categories.service';
+import { StoresService } from '../../services/stores.service';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +21,26 @@ import { CategoriesService } from '../../services/categories.service';
 export class HomeComponent {
   readonly categories$: Observable<CategoryModel[]> =
     this._categoriesService.getAllCategories();
+  readonly stores$: Observable<StoreWithTagsQueryModel[]> = combineLatest([
+    this._storesService.getAllStores(),
+    this._storesService.getAllStoreTags(),
+  ]).pipe(
+    map(([stores, tags]) => {
+      const tagsMap = tags.reduce((acc, c) => {
+        return { ...acc, [c.id]: c };
+      }, {}) as Record<string, StoreTagModel>;
+      return stores.map((store) => ({
+        id: store.id,
+        name: store.name,
+        image: store.logoUrl,
+        distance: store.distanceInMeters,
+        tags: store.tagIds.map((tagId) => tagsMap[tagId]?.name),
+      }));
+    })
+  );
 
-  constructor(private _categoriesService: CategoriesService) {}
+  constructor(
+    private _categoriesService: CategoriesService,
+    private _storesService: StoresService
+  ) {}
 }
