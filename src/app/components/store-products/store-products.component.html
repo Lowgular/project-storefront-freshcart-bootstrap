@@ -25,8 +25,8 @@
                         <h6 class="mb-0">{{store.name}}</h6>
                         <div class="small text-muted"> <span>Whatever the ocasion, we've got you covered.</span> </div>
                         <div class="input-group">
-                            <input type="text" aria-label="Last name" class="form-control w-45"
-                                placeholder="Search {{store.name}}">
+                            <input matInput [formControl]="searchProdInStore" type="text" aria-label="Last name"
+                                class="form-control w-45" placeholder="Search {{store.name}}">
                             <button class="input-group-text bg-transparent" type="submit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -42,7 +42,7 @@
                 </div>
             </ng-container>
         </div>
-        <div class="container" *ngIf="storeProducts$ | async as storeProducts">
+        <div class="container" *ngIf="filteredStoreProds$ | async as storeProducts">
             <div class="col-12">
                 <div class="mb-4">
                     <h3>{{store.name}} products:</h3>

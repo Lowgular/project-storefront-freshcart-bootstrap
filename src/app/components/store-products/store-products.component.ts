@@ -5,11 +5,21 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable, map, shareReplay, switchMap, take, tap } from 'rxjs';
+import {
+  Observable,
+  map,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+  combineLatest,
+  startWith,
+} from 'rxjs';
 import { StoresService } from '../../services/stores.service';
 import { ProductsService } from '../../services/products.service';
 import { ProductModel } from '../../models/product.model';
 import { StoreModel } from '../../models/store.model';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-store-products',
@@ -52,6 +62,23 @@ export class StoreProductsComponent implements OnInit {
     switchMap((params) => this._storesService.getStoreById(params['storeId'])),
     take(1),
     shareReplay(1)
+  );
+
+  readonly searchProdInStore: FormControl = new FormControl('');
+  readonly searchedTerm$: Observable<string> =
+    this.searchProdInStore.valueChanges.pipe(startWith(''));
+
+  readonly filteredStoreProds$: Observable<ProductModel[]> = combineLatest([
+    this.storeProducts$,
+    this.searchedTerm$,
+  ]).pipe(
+    map(([products, search]) =>
+      products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(search.toLowerCase()) ||
+          product.price.toString().includes(search.toLowerCase())
+      )
+    )
   );
 
   ngOnInit() {
