@@ -1,6 +1,6 @@
 <section class="my-lg-14 my-8">
   <div class="container">
-    <h3 class="pb-6">Shop by Category</h3>
+    <h3 class="py-6">Shop by Category</h3>
     <div class="row row-cols-1 row-cols-md-4 g-4">
       <div *ngFor="let item of categories$ | async" class="col">
         <a class="text-decoration-none text-inherit"
@@ -14,6 +14,40 @@
         >
       </div>
     </div>
+    <ng-container *ngIf="products$ | async as products">
+      <h3 class="py-6">Fruits & Vegetables</h3>
+      <div class="row row-cols-1 row-cols-md-5 g-4">
+        <div *ngFor="let item of products.fruitsAndVegetables" class="col">
+          <a class="text-decoration-none text-inherit"
+            ><!-- card -->
+            <div class="card card-product">
+              <div class="card-body text-center py-8">
+                <!-- img --><img [src]="item.imageUrl" [alt]="" /><!-- text -->
+                <div class="text-truncate pt-3">{{ item.name }}</div>
+                <div class="text-truncate pt-3">${{ item.price }}</div>
+              </div>
+            </div></a
+          >
+        </div>
+      </div>
+
+      <h3 class="py-6">Snacks & Munchies</h3>
+      <div class="row row-cols-1 row-cols-md-5 g-4">
+        <div *ngFor="let item of products.snacksAndMunchies" class="col">
+          <a class="text-decoration-none text-inherit"
+            ><!-- card -->
+            <div class="card card-product">
+              <div class="card-body text-center py-8">
+                <!-- img --><img [src]="item.imageUrl" [alt]="" /><!-- text -->
+                <div class="text-truncate pt-3">{{ item.name }}</div>
+                <div class="text-truncate pt-3">${{ item.price }}</div>
+              </div>
+            </div></a
+          >
+        </div>
+      </div>
+    </ng-container>
+
     <div *ngIf="stores$ | async as stores">
       <h3 class="py-6">Stores</h3>
       <h6>

@@ -3,13 +3,19 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import { combineLatest, map, Observable } from 'rxjs';
-import { StoreTagModel } from 'src/app/models/store-tag.model';
-import { StoreWithTagsQueryModel } from 'src/app/query-models/store-with-tags.query-model';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
-import { StoreModel } from '../../models/store.model';
+import { StoreWithTagsQueryModel } from '../../query-models/store-with-tags.query-model';
+import { StoreTagModel } from '../../models/store-tag.model';
+import { ProductModel } from '../../models/product.model';
 import { CategoriesService } from '../../services/categories.service';
 import { StoresService } from '../../services/stores.service';
+import { ProductsService } from '../../services/products.service';
+import {
+  Product,
+  ProductWithCategoryQueryModel,
+} from 'src/app/query-models/product-with-category.query-model';
 
 @Component({
   selector: 'app-home',
@@ -38,9 +44,30 @@ export class HomeComponent {
       }));
     })
   );
+  readonly products$: Observable<ProductWithCategoryQueryModel> =
+    this._productsService.getAllProducts().pipe(
+      map((products) => ({
+        fruitsAndVegetables: this.getProductsOfCategory('5', products),
+        snacksAndMunchies: this.getProductsOfCategory('2', products),
+      }))
+    );
 
   constructor(
     private _categoriesService: CategoriesService,
-    private _storesService: StoresService
+    private _storesService: StoresService,
+    private _productsService: ProductsService
   ) {}
+  private getProductsOfCategory(
+    categoryId: string,
+    products: ProductModel[]
+  ): ProductModel[] {
+    return products
+      .filter((product) => product.categoryId === categoryId)
+      .sort((a, b) => {
+        if (a.featureValue > b.featureValue) return -1;
+        if (a.featureValue < b.featureValue) return 1;
+        return 0;
+      })
+      .slice(0, 5);
+  }
 }
