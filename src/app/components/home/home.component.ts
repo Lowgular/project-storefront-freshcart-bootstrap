@@ -33,7 +33,7 @@ export class HomeComponent {
         id: store.id,
         name: store.name,
         image: store.logoUrl,
-        distance: store.distanceInMeters,
+        distance: store.distanceInMeters / 1000,
         tags: store.tagIds.map((tagId) => tagsMap[tagId]?.name),
       }));
     })
