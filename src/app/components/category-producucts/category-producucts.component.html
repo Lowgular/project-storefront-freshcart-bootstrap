@@ -14,6 +14,20 @@
             </li>
           </ul>
         </div>
+        <form
+          [formGroup]="rangePriceForm"
+          (ngSubmit)="onRangePriceFormSubmitted(rangePriceForm)"
+        >
+          <input
+            type="text"
+            formControlName="minRange"
+            placeholder="Min Range"
+          /><input
+            type="text"
+            formControlName="maxRange"
+            placeholder="Max Range"
+          /><input type="submit" value="Submit" />
+        </form>
       </div>
       <div
         class="col-12 col-lg-9 col-md-8"
@@ -26,10 +40,25 @@
             <h2 class="mb-0 fs-1">{{ category.name }}</h2>
           </div>
         </div>
-        <a
-          ><span class="text-primary">{{ products.length }}</span> Products
-          found</a
-        >
+        <div class="row justify-content-between">
+          <div class="col-4">
+            <a
+              ><span class="text-primary">{{ products.length }}</span> Products
+              found</a
+            >
+          </div>
+          <div class="col-4">
+            <select class="form-select" [formControl]="sort">
+              <option
+                *ngFor="let item of sortOption$ | async"
+                [value]="item.value"
+              >
+                {{ item.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
         <div
           class="card card-product contaimer my-2"
           *ngFor="let product of products"
@@ -49,7 +78,7 @@
             <div class="col align-self-center">
               <span>{{ category.name }}</span>
               <!-- title -->
-              <h2 class="fs-6">{{ product.name }}</h2>
+              <h2 class="fs-6">{{ product.name }}{{ product.ratingValue }}</h2>
 
               <!--raiting-->
               <small class="text-warning">
