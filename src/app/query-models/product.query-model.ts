@@ -3,7 +3,6 @@ export interface ProductQueryModel {
   readonly price: number;
   readonly ratingValue: number;
   readonly ratingCount: number;
-
   readonly imageUrl: string;
   readonly featureValue: number;
   readonly storeIds: string[];
