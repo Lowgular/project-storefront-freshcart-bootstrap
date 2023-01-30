@@ -52,40 +52,36 @@ export class CategoryProducuctsComponent {
     this._activatedRoute.params,
     this._productsService.getAllProducts(),
     this.sort.valueChanges.pipe(startWith('priceasc')),
-    this.pageParams$,
   ]).pipe(
-    map(
-      ([params, products, sortForm, queryParams]: [
-        Params,
-        ProductModel[],
-        string,
-        CategoryPageParamsQueryModel
-      ]) => {
-        const filteredProducts = products
-          .filter((product) => product.categoryId === params['categoryId'])
-          .map((product) => ({
-            name: product.name,
-            price: product.price,
-            ratingValue: product.ratingValue,
-            ratingCount: product.ratingCount,
-            imageUrl: product.imageUrl,
-            featureValue: product.featureValue,
-            storeIds: product.storeIds,
-            id: product.id,
-            starsRating: this._showStars(product.ratingValue),
-          }));
-        return this._sortingProducts(filteredProducts, sortForm);
-      }
-    )
+    map(([params, products, sortForm]: [Params, ProductModel[], string]) => {
+      const productsMap = products.reduce((acc: any, c: any) => {
+        if (c.categoryId === params['categoryId']) {
+          return [
+            ...acc,
+            {
+              name: c.name,
+              price: c.price,
+              ratingValue: c.ratingValue,
+              ratingCount: c.ratingCount,
+              imageUrl: c.imageUrl,
+              featureValue: c.featureValue,
+              storeIds: c.storeIds,
+              id: c.id,
+              starsRating: this._showStars(c.ratingValue),
+            },
+          ];
+        }
+        return acc;
+      }, []);
+
+      return this._sortingProducts(productsMap, sortForm);
+    })
   );
   readonly pageNumber$: Observable<number[]> = combineLatest([
     this.products$,
     this.pageParams$,
   ]).pipe(
     map(([products, params]) => {
-      console.log(
-        Array.from(Array(Math.ceil(products.length / params.pageSize)).keys())
-      );
       return Array.from(
         Array(Math.ceil(products.length / params.pageSize)).keys()
       ).map((n) => {
@@ -141,6 +137,7 @@ export class CategoryProducuctsComponent {
   }
   private _sortingProducts(
     products: ProductQueryModel[],
+
     order: string
   ): ProductQueryModel[] {
     if (order.includes('asc')) {
