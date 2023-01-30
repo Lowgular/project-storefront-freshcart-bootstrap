@@ -1,4 +1,8 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, combineLatest, of } from 'rxjs';
@@ -38,20 +42,27 @@ export class CategoryProducuctsComponent {
     this.sort.valueChanges.pipe(startWith('priceAsc')),
   ]).pipe(
     map(([params, products, sortForm]: [Params, ProductModel[], string]) => {
-      const filteredProducts = products
-        .filter((product) => product.categoryId === params['categoryId'])
-        .map((product) => ({
-          name: product.name,
-          price: product.price,
-          ratingValue: product.ratingValue,
-          ratingCount: product.ratingCount,
-          imageUrl: product.imageUrl,
-          featureValue: product.featureValue,
-          storeIds: product.storeIds,
-          id: product.id,
-          starsRating: this._showStars(product.ratingValue),
-        }));
-      return this._sortingProducts(filteredProducts, sortForm);
+      const productsMap = products.reduce((acc: any, c: any) => {
+        if (c.categoryId === params['categoryId']) {
+          return [
+            ...acc,
+            {
+              name: c.name,
+              price: c.price,
+              ratingValue: c.ratingValue,
+              ratingCount: c.ratingCount,
+              imageUrl: c.imageUrl,
+              featureValue: c.featureValue,
+              storeIds: c.storeIds,
+              id: c.id,
+              starsRating: this._showStars(c.ratingValue),
+            },
+          ];
+        }
+        return acc;
+      }, []);
+
+      return this._sortingProducts(productsMap, sortForm);
     })
   );
   readonly sortOption$: Observable<SortOptionQueryModel[]> = of([
@@ -71,7 +82,7 @@ export class CategoryProducuctsComponent {
     private _categoriesService: CategoriesService,
     private _activatedRoute: ActivatedRoute,
     private _productsService: ProductsService
-  ) { }
+  ) {}
   private _showStars(ratingValue: number): number[] {
     let stars = [];
     let index = 1;
@@ -88,11 +99,11 @@ export class CategoryProducuctsComponent {
   }
   private _sortingProducts(
     products: ProductQueryModel[],
+
     order: string
   ): ProductQueryModel[] {
     if (order.includes('asc')) {
       return products.sort((a, b) => {
-        console.log('a:', a.price, 'b:', b.price);
         return a.price > b.price ? 1 : -1;
       });
     }
@@ -101,6 +112,5 @@ export class CategoryProducuctsComponent {
     });
   }
 
-  onRangePriceFormSubmitted(rangePriceForm: FormGroup): void {
-  }
+  onRangePriceFormSubmitted(rangePriceForm: FormGroup): void {}
 }
