@@ -5,8 +5,15 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable, combineLatest, of } from 'rxjs';
-import { filter, map, startWith, switchMap, tap } from 'rxjs/operators';
+import { Observable, combineLatest, of, range } from 'rxjs';
+import {
+  debounceTime,
+  filter,
+  map,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
 import { CategoryPageParamsQueryModel } from '../../query-models/category-page-params.query-model';
 import { ProductQueryModel } from '../../query-models/product.query-model';
@@ -25,8 +32,8 @@ import { ProductsService } from '../../services/products.service';
 export class CategoryProducuctsComponent {
   readonly sort: FormControl = new FormControl();
   readonly rangePriceForm: FormGroup = new FormGroup({
-    minRange: new FormControl(),
-    maxRange: new FormControl(),
+    minPrice: new FormControl(),
+    maxPrice: new FormControl(),
   });
 
   readonly categoryDetail$: Observable<CategoryModel> =
@@ -52,40 +59,61 @@ export class CategoryProducuctsComponent {
     this._activatedRoute.params,
     this._productsService.getAllProducts(),
     this.sort.valueChanges.pipe(startWith('priceasc')),
+    this.rangePriceForm.valueChanges.pipe(
+      debounceTime(1000),
+      startWith({ minPrice: 0, maxPrice: 10000 })
+    ),
   ]).pipe(
-    map(([params, products, sortForm]: [Params, ProductModel[], string]) => {
-      const productsMap = products.reduce((acc: any, c: any) => {
-        if (c.categoryId === params['categoryId']) {
-          return [
-            ...acc,
-            {
-              name: c.name,
-              price: c.price,
-              ratingValue: c.ratingValue,
-              ratingCount: c.ratingCount,
-              imageUrl: c.imageUrl,
-              featureValue: c.featureValue,
-              storeIds: c.storeIds,
-              id: c.id,
-              starsRating: this._showStars(c.ratingValue),
-            },
-          ];
-        }
-        return acc;
-      }, []);
-
-      return this._sortingProducts(productsMap, sortForm);
-    })
+    map(
+      ([params, products, sortForm, rangePrice]: [
+        Params,
+        ProductModel[],
+        string,
+        any
+      ]) => {
+        console.log(rangePrice.minPrice);
+        const productsMap = products.reduce((acc: any, c: any) => {
+          if (c.categoryId === params['categoryId']) {
+            return [
+              ...acc,
+              {
+                name: c.name,
+                price: c.price,
+                ratingValue: c.ratingValue,
+                ratingCount: c.ratingCount,
+                imageUrl: c.imageUrl,
+                featureValue: c.featureValue,
+                storeIds: c.storeIds,
+                id: c.id,
+                starsRating: this._showStars(c.ratingValue),
+              },
+            ];
+          }
+          return acc;
+        }, []);
+        return this._sortingProducts(productsMap, sortForm)
+          .filter((product) =>
+            rangePrice.minPrice
+              ? product.price >= +rangePrice.minPrice
+              : product
+          )
+          .filter((product) =>
+            rangePrice.maxPrice
+              ? product.price <= +rangePrice.maxPrice
+              : product
+          );
+      }
+    )
   );
   readonly pageNumber$: Observable<number[]> = combineLatest([
     this.products$,
     this.pageParams$,
   ]).pipe(
     map(([products, params]) => {
+      console.log(products);
       return Array.from(
         Array(Math.ceil(products.length / params.pageSize)).keys()
       ).map((n) => {
-        console.log(n + 1);
         return n + 1;
       });
     })
@@ -179,6 +207,4 @@ export class CategoryProducuctsComponent {
       )
       .subscribe();
   }
-
-  onRangePriceFormSubmitted(rangePriceForm: FormGroup): void {}
 }

@@ -14,19 +14,19 @@
             </li>
           </ul>
         </div>
-        <form
-          [formGroup]="rangePriceForm"
-          (ngSubmit)="onRangePriceFormSubmitted(rangePriceForm)"
-        >
+        <form [formGroup]="rangePriceForm">
+          <h6>Price</h6>
           <input
             type="text"
-            formControlName="minRange"
-            placeholder="Min Range"
+            formControlName="minPrice"
+            placeholder="Price from"
+            class="form-control my-1"
           /><input
             type="text"
-            formControlName="maxRange"
-            placeholder="Max Range"
-          /><input type="submit" value="Submit" />
+            formControlName="maxPrice"
+            placeholder="Price to"
+            class="form-control my-1"
+          />
         </form>
       </div>
       <div
