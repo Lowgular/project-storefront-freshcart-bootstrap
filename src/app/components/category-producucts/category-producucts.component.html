@@ -61,7 +61,7 @@
 
         <div
           class="card card-product contaimer my-2"
-          *ngFor="let product of products"
+          *ngFor="let product of paginationProducts$ | async"
         >
           <div class="card-body row">
             <div class="col-5">
@@ -99,6 +99,33 @@
                 <span class="text-dark">${{ product.price }}</span>
               </div>
             </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <div class="col-4">
+            <h6><b>Limit</b></h6>
+            <nav>
+              <ul class="pagination">
+                <li class="page-item" *ngFor="let item of pageSize$ | async">
+                  <a class="page-link" (click)="setPageSize(item)">{{
+                    item
+                  }}</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <div class="col-4">
+            <h6><b>Pagination</b></h6>
+            <nav>
+              <ul class="pagination">
+                <li class="page-item" *ngFor="let item of pageNumber$ | async">
+                  <a class="page-link" (click)="setPageNumber(item)">{{
+                    item
+                  }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
