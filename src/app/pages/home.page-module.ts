@@ -6,10 +6,15 @@ import {StoresServiceModule} from '../lib/src/lib/adapters/secondary/services/st
 import {HomePage} from './home.page';
 
 @NgModule({
-  imports: [HeaderComponentModule, CategoriesServiceModule, FooterComponentModule, StoresServiceModule],
+  imports: [
+    HeaderComponentModule,
+    CategoriesServiceModule,
+    FooterComponentModule,
+    StoresServiceModule,
+  ],
   declarations: [HomePage],
   providers: [],
-  exports: [HomePage]
+  exports: [HomePage],
 })
 export class HomePageModule {
 }
