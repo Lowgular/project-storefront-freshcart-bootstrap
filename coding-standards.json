@@ -2,7 +2,7 @@
   "workspace": {
     "workspaceConfig": "angular.json",
     "workspaceTsConfig": "tsconfig.json",
-    "libsFolder": "projects"
+    "libsFolder": "src/app"
   },
   "entityRelations": {
     "page": {

@@ -105,6 +105,33 @@
           }
         }
       }
+    },
+    "lib": {
+      "projectType": "library",
+      "root": "src/app/lib",
+      "sourceRoot": "src/app/lib/src",
+      "prefix": "lib",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/lib"
+          ],
+          "options": {
+            "jestConfig": "src/app/lib/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "/src/app/lib/**/*.ts",
+              "/src/app/lib/**/*.html"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "ng-freshcard-bootstrap-theme"
