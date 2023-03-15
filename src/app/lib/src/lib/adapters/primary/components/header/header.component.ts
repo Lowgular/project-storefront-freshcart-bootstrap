@@ -3,9 +3,9 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
-import {CategoriesService} from '../../../secondary/services/categories/categories.service';
-import {Observable} from 'rxjs';
-import {CategoryDTO} from '../../../../application/ports/secondary/dto/category.dto';
+import { CategoriesService } from '../../../secondary/services/categories/categories.service';
+import { Observable } from 'rxjs';
+import { CategoryDTO } from '../../../../application/ports/secondary/dto/category.dto';
 
 @Component({
   selector: 'lib-header',
@@ -15,8 +15,7 @@ import {CategoryDTO} from '../../../../application/ports/secondary/dto/category.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  constructor(private categoriesService: CategoriesService) {
-  }
-  
+  constructor(private categoriesService: CategoriesService) {}
+
   categories$: Observable<CategoryDTO[]> = this.categoriesService.getAll();
 }
