@@ -43,8 +43,8 @@
         <ul class="nav">
           <li *ngFor="let item of categories$ | async" class="nav-item">
             <a [routerLink]="'/categories/' + item.id" class="nav-link">{{
-                item.name
-              }}</a>
+              item.name
+            }}</a>
           </li>
         </ul>
       </div>
