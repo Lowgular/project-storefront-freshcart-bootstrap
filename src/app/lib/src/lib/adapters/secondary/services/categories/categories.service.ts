@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {CategoryDTO} from '../../../../application/ports/secondary/dto/category.dto';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { CategoryDTO } from '../../../../application/ports/secondary/dto/category.dto';
 
 @Injectable()
 export class CategoriesService {

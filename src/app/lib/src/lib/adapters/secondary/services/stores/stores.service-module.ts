@@ -1,5 +1,5 @@
-import {NgModule} from '@angular/core';
-import {StoresService} from './stores.service';
+import { NgModule } from '@angular/core';
+import { StoresService } from './stores.service';
 
 @NgModule({
   imports: [],

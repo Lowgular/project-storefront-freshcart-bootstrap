@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {ProductDTO} from '../../../../application/ports/secondary/dto/product.dto';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ProductDTO } from '../../../../application/ports/secondary/dto/product.dto';
 
 @Injectable()
 export class ProductsService {

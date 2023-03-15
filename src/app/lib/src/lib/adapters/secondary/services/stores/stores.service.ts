@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {StoreDTO} from '../../../../application/ports/secondary/dto/store.dto';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { StoreDTO } from '../../../../application/ports/secondary/dto/store.dto';
 
 @Injectable()
 export class StoresService {

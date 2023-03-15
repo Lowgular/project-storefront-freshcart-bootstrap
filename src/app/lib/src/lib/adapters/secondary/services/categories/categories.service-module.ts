@@ -1,5 +1,5 @@
-import {NgModule} from '@angular/core';
-import {CategoriesService} from './categories.service';
+import { NgModule } from '@angular/core';
+import { CategoriesService } from './categories.service';
 
 @NgModule({
   imports: [],
