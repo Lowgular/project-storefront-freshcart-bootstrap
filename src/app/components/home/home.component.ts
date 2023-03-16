@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
-import { combineLatest, map, Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
 import { StoreModel } from '../../models/store.model';
-import { ProductModel } from '../../models/product.model';
+import { ProductQueryModel } from '../../query-models/product.query-model';
+import { StoreTagModel } from '../../models/store-tag.model';
 import { CategoryService } from '../../services/category.service';
 import { StoreService } from '../../services/store.service';
 import { ProductService } from '../../services/product.service';
-import { ProductQueryModel } from 'src/app/query-models/product.query-model';
+import { StoreQueryModel } from 'src/app/query-models/store.query-model';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +19,27 @@ import { ProductQueryModel } from 'src/app/query-models/product.query-model';
 })
 export class HomeComponent {
   readonly categories$: Observable<CategoryModel[]> = this._categoryService.getAll();
-  readonly stores$: Observable<StoreModel[]> = this._storeService.getAll();
+  
+  readonly stores$: Observable<StoreQueryModel[]> = combineLatest([
+    this._storeService.getAll(),
+    this._storeService.getStoreTags()
+  ]).pipe(
+    map(([stores, tags]) => {
+      const tagMap = tags.reduce((acc, curr) => {
+        return {...acc, [curr.id]: curr.name}
+      }, {} as Record<string, string>) 
+      return stores.map(store => {
+        return {
+          name: store.name,
+          id: store.id,
+          distanceInMeters: store.distanceInMeters,
+          logoUrl: store.logoUrl,
+          tagNames: store.tagIds.map(tagIds => tagMap[tagIds])
+        }
+      })
+    })
+  )
+
 
   readonly products$: Observable<ProductQueryModel[]> = combineLatest([
     this._productService.getAll(),
@@ -25,7 +47,7 @@ export class HomeComponent {
   ]).pipe(
     map(([products, categories]) => {
       const categoryMap = categories.reduce((acc, curr) => {
-        return {...acc, [curr.id]: curr} 
+        return { ...acc, [curr.id]: curr }
       }, {} as Record<string, CategoryModel>)
       return products.map(prod => {
         return {
@@ -33,7 +55,7 @@ export class HomeComponent {
           price: prod.price,
           featureValue: prod.featureValue,
           imageUrl: prod.imageUrl,
-          categoryName: categoryMap[prod.categoryId].name
+          categoryName: categoryMap[prod.categoryId]?.name
         }
       })
     })
@@ -41,20 +63,21 @@ export class HomeComponent {
   readonly fruitsVegetables$: Observable<ProductQueryModel[]> = this.products$.pipe(
     map((products) => {
       return products
-      .filter(prod => prod.categoryName === 'Fruits & Vegetables')
-      .slice(0,5)
-      .sort((a,b) => a.featureValue < b.featureValue ? 1 : -1)
+        .filter(prod => prod.categoryName === 'Fruits & Vegetables')
+        .slice(0, 5)
+        .sort((a, b) => a.featureValue < b.featureValue ? 1 : -1)
     })
   )
-    readonly snackMunchies$: Observable<ProductQueryModel[]> = this.products$.pipe(
+  readonly snackMunchies$: Observable<ProductQueryModel[]> = this.products$.pipe(
     map((products) => {
       return products
-      .filter(prod =>  prod.categoryName === 'Snack & Munchies')
-      .slice(0,5)
-      .sort((a,b) => a.featureValue < b.featureValue ? 1 : -1)
+        .filter(prod => prod.categoryName === 'Snack & Munchies')
+        .slice(0, 5)
+        .sort((a, b) => a.featureValue < b.featureValue ? 1 : -1)
     })
   )
 
   constructor(private _categoryService: CategoryService, private _storeService: StoreService, private _productService: ProductService) {
+    this.stores$.subscribe(value => console.log(value))
   }
 }

@@ -6,9 +6,11 @@ import { filter, map, startWith, switchMap } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
 import { StoreModel } from '../../models/store.model';
 import { ProductModel } from '../../models/product.model';
+import { StoreTagModel } from '../../models/store-tag.model';
 import { CategoryService } from '../../services/category.service';
 import { StoreService } from '../../services/store.service';
 import { ProductService } from '../../services/product.service';
+import { StoreQueryModel } from 'src/app/query-models/store.query-model';
 
 @Component({
   selector: 'app-store-products',
@@ -19,9 +21,8 @@ import { ProductService } from '../../services/product.service';
 })
 export class StoreProductsComponent {
   readonly activatedRouteParam$: Observable<Params> = this._activatedRoute.params
-
   readonly categories$: Observable<CategoryModel[]> = this._categoryService.getAll()
-  readonly stores$: Observable<StoreModel[]> = this._storeService.getAll();
+  readonly stores$: Observable<StoreModel[]> = this._storeService.getAll()
 
   readonly oneStore$: Observable<StoreModel> = this.activatedRouteParam$.pipe(
     switchMap(data => this._storeService.getOne(data['storeId'])))
